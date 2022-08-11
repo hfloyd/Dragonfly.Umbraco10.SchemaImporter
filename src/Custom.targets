@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="CopyPackage" AfterTargets="Pack">
+    <Copy SourceFiles="$(ProjectDir)bin\$(ConfigurationName)\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(SolutionDir)..\..\LocalNuGetPackages\" />
+  </Target>
+  <Target Name="PushNugetPackage" AfterTargets="Pack" Condition="'$(Configuration)' == 'Release'">
+    <!--<Message Text="HLF - Package Location: %27$(ProjectDir)bin\$(ConfigurationName)\$(PackageId).$(PackageVersion).nupkg%27" Importance="high"/>-->
+    <!--Push to -source https://www.nuget.org-->
+    <Exec Command="nuget.exe push &quot;$(ProjectDir)bin\$(ConfigurationName)\$(PackageId).$(PackageVersion).nupkg&quot; -source https://www.nuget.org" />
+  </Target>
+
+</Project>
