@@ -7,6 +7,9 @@ A tool to quickly import a generated package.xml file into the back-office of an
 
     PM > Install-Package Dragonfly.Umbraco10.SchemaImporter
 
+## Usage ##
+A Dashboard is added to the "Settings" section int he Umbraco back-office (ex: http://YOURSITE.COM/umbraco/#/settings?dashboard=Dragonfly.SchemaImporter)
+
 ## Versions ##
 Certain versions have been compiled with a minimum required Umbraco CMS dependency. Listed below are the latest versions for each minimum Umbraco version.
 
