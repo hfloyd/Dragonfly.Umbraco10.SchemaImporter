@@ -1,33 +1,79 @@
-﻿<div class="DragonflyDashboard">
-    <div>
-        <div class="umb-editor-sub-header" umb-sticky-bar="">
-            <h3>Umbraco Schema Importer</h3>
-        </div>
-        <p>
-            This initial release version of the package only supports 'package.xml' importing (not .zip files which include media items).
-            Additionally, it assumes you have a single 'package.xml' file manually added to the folder "wwwroot/Temp/SchemaImporter".
-        </p>
-        <p>
-            <div class="umb-button">
-                <a href="/umbraco/backoffice/Dragonfly/SchemaImporter/Import" target="_blank" rel="noopener" class="btn umb-button__button btn-success umb-button--l">
-                    IMPORT
-                </a>
+﻿<div ng-controller="SchemaImporterController as vm" class="dragonfly-dashboard">
+
+    <umb-box>
+        <umb-box-content>
+            <h2>{{vm.title}}</h2>
+            <h5>{{vm.description}}</h5>
+            <p>This initial release version of the package only supports 'package.xml' importing (not .zip files which include media items).</p>
+        </umb-box-content>
+    </umb-box>
+
+    <umb-box>
+        <umb-box-header title="Upload & Import File"
+                        description="Upload a package.xml file for importing.">
+        </umb-box-header>
+        <umb-box-content>
+
+            <input id="importfilepicker"
+                   type="file"
+                   accept=""
+                   ngf-select
+                   ngf-model="filesHolder"
+                   ngf-change="vm.handleFiles($files, $event)"
+                   ngf-multipart="true" />
+
+            <label for="importfilepicker"
+                   class="btn btn-default">Choose File</label>
+
+            <umb-button action="vm.upload(vm.file)"
+                        type="button"
+                        label-key="general_upload"
+                        button-style="success"
+                        ng-if="vm.file != null"
+                        state="vm.buttonState"
+                        disabled="vm.buttonState == 'busy'">
+            </umb-button>
+        </umb-box-content>
+
+	    <umb-box-content>
+
+		    <div><b>Results: <br/></b>
+                 <span>{{vm.uploadResultStatus.message}}</span>
             </div>
-        </p>
 
-        <p>
-            Development To-Dos:
-            <ul>
-                <li>Add File Upload field to the dashboard, which would pass in the uploaded file name to the Import() function.</li>
-                <li>Have the back-office dashboard display detailed result data from the import</li>
-                <li>Support .zip file importing (processing included Media files)</li>
-            </ul>
-        </p>
+	    </umb-box-content>
+    </umb-box>
 
-    </div>
 
-    <p class="mt5">
-        <small><localize key="SchemaImporter_MoreInfo">For more information and updates</localize>: <a href="https://github.com/hfloyd/Dragonfly.Umbraco10.SchemaImporter" target="_blank">Dragonfly.Umbraco10.SchemaImporter</a> </small>
-    </p>
+    <umb-box>
+        <umb-box-content>
+            <p>
+                Development To-Dos:
+                <ul>
+                    <li>Have the back-office dashboard display detailed result data from the import</li>
+                    <li>Support .zip file importing (processing included Media files)</li>
+                </ul>
+            </p>
+        </umb-box-content>
+    </umb-box>
+
+	<umb-box>
+		<umb-box-header title="MVP (Minimum Viable Product) Import File"
+		                description="This option assumes you have a single 'package.xml' file manually added to the folder 'wwwroot/Temp/SchemaImporter'.">
+		</umb-box-header>
+		<umb-box-content>
+			<p>
+			<div class="umb-button">
+				<a href="/umbraco/backoffice/Dragonfly/SchemaImporter/ImportDefault" target="_blank" rel="noopener" class="btn umb-button__button btn-success umb-button--l">
+					IMPORT
+				</a>
+			</div>
+		</umb-box-content>
+	</umb-box>
+
+	<p class="mt5">
+        Current version: <b>{{vm.version}}</b><br/>
+		<small><localize key="SchemaImporter_MoreInfo">For more information and updates</localize>: <a href="https://github.com/hfloyd/Dragonfly.Umbraco10.SchemaImporter" target="_blank">Dragonfly.Umbraco10.SchemaImporter</a> </small>
+	</p>
 </div>
 

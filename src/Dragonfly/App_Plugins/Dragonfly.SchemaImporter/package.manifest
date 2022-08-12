@@ -1,4 +1,5 @@
 ﻿{
+    "name": "Dragonfly Schema Importer",
     "dashboards": [
         {
             "alias": "Dragonfly.SchemaImporter",
@@ -9,11 +10,11 @@
     ],
 
     "javascript": [
-
+        "~/App_Plugins/Dragonfly.SchemaImporter/schemaImporterController.js"
     ],
 
     "css": [
-
+        "~/App_Plugins/Dragonfly.SchemaImporter/schemaImporter.css"
     ]
-
+    
 }
