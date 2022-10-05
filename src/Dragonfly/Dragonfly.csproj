@@ -18,7 +18,7 @@
 		<RepositoryUrl>https://github.com/hfloyd/Dragonfly.Umbraco10.SchemaImporter</RepositoryUrl>
 
 		<PackageTags>Umbraco 10</PackageTags>
-		<PackageReleaseNotes>Added ability to upload package.xml file via back-office dashboard UI</PackageReleaseNotes>
+		<PackageReleaseNotes>Fixes</PackageReleaseNotes>
 	</PropertyGroup>
 
 	<!-- Author Info + Legal-->
@@ -37,7 +37,7 @@
 	<PropertyGroup>
 		<RootNamespace>Dragonfly</RootNamespace>
 		<AssemblyName>Dragonfly.SchemaImporter</AssemblyName>
-		<Version>0.2.0</Version>
+		<Version>0.3.0</Version>
 		<AssemblyVersion>$(Version)</AssemblyVersion>
 		<FileVersion>$(Version)</FileVersion>
 	</PropertyGroup>

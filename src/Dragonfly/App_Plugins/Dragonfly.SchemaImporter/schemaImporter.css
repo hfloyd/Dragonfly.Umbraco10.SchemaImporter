@@ -5,8 +5,8 @@
     display: none;
 }
 
-/*// Safari only*/
-@media not all and (min-resolution:.001dpcm) {
+/* Safari only*/
+/*@media not all and (min-resolution:.001dpcm) {
     @supports (-webkit-appearance:none) {
         text-indent: -120px;
         margin-left: -7em;
@@ -15,4 +15,4 @@
             display: inline;
         }
     }
-}
+}*/
