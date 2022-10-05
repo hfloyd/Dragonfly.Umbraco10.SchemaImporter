@@ -3,7 +3,7 @@
 [Oo]bj/
 
 # Project-specific files/folders
-build/
+#build/#
 *lnk
 
 
