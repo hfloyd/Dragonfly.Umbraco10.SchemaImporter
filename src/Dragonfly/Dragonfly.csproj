@@ -13,11 +13,11 @@
 		<Product>Dragonfly Umbraco 10 SchemaImporter</Product>
 		<Description>A tool to quickly import a generated package.xml file into the back-office of an Umbraco 10 Site</Description>
 
-		<PackageProjectUrl>https://github.com/hfloyd/Dragonfly.Umbraco10.SchemaImporter</PackageProjectUrl>
+		<PackageProjectUrl>https://dragonflylibraries.com/umbraco-packages/schema-importer/</PackageProjectUrl>
 		<RepositoryType>GIT</RepositoryType>
 		<RepositoryUrl>https://github.com/hfloyd/Dragonfly.Umbraco10.SchemaImporter</RepositoryUrl>
 
-		<PackageTags>Umbraco 10</PackageTags>
+		<PackageTags>Umbraco,Umbraco-10;umbraco-marketplace</PackageTags>
 		<PackageReleaseNotes>Fixes</PackageReleaseNotes>
 	</PropertyGroup>
 
@@ -37,12 +37,17 @@
 	<PropertyGroup>
 		<RootNamespace>Dragonfly</RootNamespace>
 		<AssemblyName>Dragonfly.SchemaImporter</AssemblyName>
-		<Version>1.0.0</Version>
+		<Version>1.1.1</Version>
 		<AssemblyVersion>$(Version)</AssemblyVersion>
 		<FileVersion>$(Version)</FileVersion>
+		<PackageIcon>Dragonfly-SchemaImporter-128.png</PackageIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<None Include="..\..\Dragonfly-SchemaImporter-128.png">
+		  <Pack>True</Pack>
+		  <PackagePath>\</PackagePath>
+		</None>
 		<None Include="..\..\LICENSE.md">
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
@@ -55,12 +60,9 @@
 
 	<!-- Packages-->
 	<ItemGroup>
-		<PackageReference Include="Dragonfly.Net5" Version="1.2.0" />
+		<PackageReference Include="Dragonfly.Net5" Version="1.3.0" />
 		<PackageReference Include="Umbraco.Cms.Core" Version="10.0.1" PrivateAssets="All" />
-
-		<PackageReference Include="Umbraco.Cms.Web.Website" Version="10.0.1" PrivateAssets="All">
-			<TreatAsUsed>true</TreatAsUsed>
-		</PackageReference>
+		<PackageReference Include="Umbraco.Cms.Web.Website" Version="10.0.1" PrivateAssets="All" />
 		<PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="10.0.1" PrivateAssets="All" />
 	</ItemGroup>
 

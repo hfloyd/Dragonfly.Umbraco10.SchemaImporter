@@ -33,7 +33,7 @@
         function upload(file) {
             vm.buttonState = 'busy';
             Upload.upload({
-                url: '/umbraco/backoffice/Dragonfly/SchemaImporter/UploadImport',
+                url: '/umbraco/backoffice/Dragonfly/SchemaImporter/UploadImport/',
                 fields: {
                     'someId': 1234
                 },
@@ -76,7 +76,7 @@
         }
 
         function getVersion() {
-            vm.version = $http.get('/umbraco/backoffice/Dragonfly/SchemaImporter/GetVersion');
+            vm.version = $http.get('/umbraco/backoffice/Dragonfly/SchemaImporter/GetVersion/');
         }
     }
 
