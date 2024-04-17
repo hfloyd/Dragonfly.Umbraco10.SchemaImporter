@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
 		<MvcRazorCompileOnPublish>false</MvcRazorCompileOnPublish>
 		<ContentTargetFolders>content</ContentTargetFolders>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -17,8 +16,8 @@
 		<RepositoryType>GIT</RepositoryType>
 		<RepositoryUrl>https://github.com/hfloyd/Dragonfly.Umbraco10.SchemaImporter</RepositoryUrl>
 
-		<PackageTags>Umbraco,Umbraco-10;umbraco-marketplace</PackageTags>
-		<PackageReleaseNotes>Fixes</PackageReleaseNotes>
+		<PackageTags>Umbraco,Umbraco-10;Umbraco-11;Umbraco-12;Umbraco-13;umbraco-marketplace</PackageTags>
+		<PackageReleaseNotes>Updated to use 'Dragonfly.Net6'</PackageReleaseNotes>
 	</PropertyGroup>
 
 	<!-- Author Info + Legal-->
@@ -37,10 +36,11 @@
 	<PropertyGroup>
 		<RootNamespace>Dragonfly</RootNamespace>
 		<AssemblyName>Dragonfly.SchemaImporter</AssemblyName>
-		<Version>1.2.0</Version>
+		<Version>2.0.0</Version>
 		<AssemblyVersion>$(Version)</AssemblyVersion>
 		<FileVersion>$(Version)</FileVersion>
 		<PackageIcon>Dragonfly-SchemaImporter-128.png</PackageIcon>
+		<TargetFrameworks>net6.0</TargetFrameworks>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -60,8 +60,9 @@
 
 	<!-- Packages-->
 	<ItemGroup>
-		<PackageReference Include="Dragonfly.Net5" Version="1.3.0" />
-		<PackageReference Include="Umbraco.Cms.Core" Version="[10.0.1, 11.0.0)" />
+		<!--<PackageReference Include="Dragonfly.Net6" Version="1.3.0" />-->
+		<PackageReference Include="Dragonfly.Net6" Version="1.0.0" />
+		<PackageReference Include="Umbraco.Cms.Core" Version="[10.0.1, 14.0.0]" />
 		<PackageReference Include="Umbraco.Cms.Web.Website" Version="10.0.1" PrivateAssets="All" />
 		<PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="10.0.1" PrivateAssets="All" />
 	</ItemGroup>

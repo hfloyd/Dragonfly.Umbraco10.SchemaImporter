@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+﻿
 
-namespace Dragonfly.SchemaImporter
-{
+namespace Dragonfly.SchemaImporter;
+
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -17,11 +15,10 @@ namespace Dragonfly.SchemaImporter
     using Microsoft.Extensions.Logging;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
-    using NPoco.fastJSON;
     using Umbraco.Cms.Web.BackOffice.Controllers;
     using Umbraco.Cms.Web.Common.Attributes;
     using Umbraco.Extensions;
-
+    using System.Collections.Generic;
 
     //  /umbraco/backoffice/Dragonfly/SchemaImporter/
     [PluginController("Dragonfly")]
@@ -152,7 +149,7 @@ namespace Dragonfly.SchemaImporter
                 catch (Exception ex)
                 {
                     var result = new StatusMessage(false, msgDefault);
-                    result.RelatedException = ex;
+                    result.SetRelatedException( ex);
 
                     _logger.LogError($"{msgDefault}: {ex.Message}", ex);
 
@@ -193,9 +190,9 @@ namespace Dragonfly.SchemaImporter
 
             if (Msg.HasAnyExceptions())
             {
-                if (Msg.RelatedException != null)
+                if (Msg.GetRelatedException() != null)
                 {
-                    var err = $"Exception: {Msg.RelatedException.Message} - See Log for details";
+                    var err = $"Exception: {Msg.GetRelatedException().Message} - See Log for details";
                     errors.Add(err);
                 }
 
@@ -203,9 +200,9 @@ namespace Dragonfly.SchemaImporter
                 {
                     foreach (var innerStatus in Msg.InnerStatuses)
                     {
-                        if (innerStatus.RelatedException != null)
+                        if (innerStatus.GetRelatedException() != null)
                         {
-                            var err = $"Exception: {innerStatus.RelatedException.Message} - See Log for details";
+                            var err = $"Exception: {innerStatus.GetRelatedException().Message} - See Log for details";
                             errors.Add(err);
                         }
                     }
@@ -249,6 +246,5 @@ namespace Dragonfly.SchemaImporter
 
         public StatusMessage DetailedResultStatus { get; set; }
     }
-}
 
 
