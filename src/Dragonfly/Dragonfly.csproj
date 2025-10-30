@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net6.0</TargetFrameworks>
+		<TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+		<!--<TargetFramework>net6.0</TargetFramework>-->
+		<!--<TargetFramework>net8.0</TargetFramework>-->
 		<MvcRazorCompileOnPublish>false</MvcRazorCompileOnPublish>
 		<ContentTargetFolders>content</ContentTargetFolders>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -11,7 +13,7 @@
 		<PackageId>Dragonfly.Umbraco10.SchemaImporter</PackageId>
 		<Title>Dragonfly Umbraco 10 SchemaImporter</Title>
 		<Product>Dragonfly Umbraco 10 SchemaImporter</Product>
-		<Description>A tool to quickly import a generated package.xml file into the back-office of an Umbraco 10 Site</Description>
+		<Description>A tool to quickly import a generated package.xml file into the back-office of an Umbraco 10 - 13 Site</Description>
 
 		<PackageProjectUrl>https://dragonflylibraries.com/umbraco-packages/schema-importer/</PackageProjectUrl>
 		<RepositoryType>GIT</RepositoryType>
@@ -37,17 +39,17 @@
 	<PropertyGroup>
 		<RootNamespace>Dragonfly</RootNamespace>
 		<AssemblyName>Dragonfly.SchemaImporter</AssemblyName>
-		<Version>2.2.1</Version>
+		<Version>3.0.0</Version>
 		<AssemblyVersion>$(Version)</AssemblyVersion>
 		<FileVersion>$(Version)</FileVersion>
-		<PackageReleaseNotes>Fixing Dependencies</PackageReleaseNotes>
+		<PackageReleaseNotes>Fixing Dependencies, adding multi-targeting support</PackageReleaseNotes>
 
 	</PropertyGroup>
 
 	<ItemGroup>
 		<None Include="..\..\Dragonfly-SchemaImporter-128.png">
-		  <Pack>True</Pack>
-		  <PackagePath>\</PackagePath>
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
 		</None>
 		<None Include="..\..\LICENSE.md">
 			<Pack>True</Pack>
@@ -60,12 +62,30 @@
 	</ItemGroup>
 
 	<!-- Packages-->
+	<!--Umbraco 10-->
+	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+		<PackageReference Include="Umbraco.Cms.Core" Version="[10.0.1,11.0.0)" />
+		<PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="[10.0.1,11.0.0)" PrivateAssets="All" />
+		<PackageReference Include="Umbraco.Cms.Web.Website" Version="[10.0.1,11.0.0)" PrivateAssets="All" />
+	</ItemGroup>
+
+	<!--Umbraco 11/12-->
+	<ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+		<PackageReference Include="Umbraco.Cms.Core" Version="[11.0.0,13.0.0)" />
+		<PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="[10.0.1,13.0.0)" PrivateAssets="All" />
+		<PackageReference Include="Umbraco.Cms.Web.Website" Version="[10.0.1,13.0.0)" PrivateAssets="All" />
+	</ItemGroup>
+
+	<!--Umbraco 13-->
+	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+		<PackageReference Include="Umbraco.Cms.Core" Version="[13.0.1,14.0.0)" />
+		<PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="[13.0.1,14.0.0)" PrivateAssets="All" />
+		<PackageReference Include="Umbraco.Cms.Web.Website" Version="[13.0.1,14.0.0)" PrivateAssets="All" />
+	</ItemGroup>
+
+	<!--Any Umbraco Version -->
 	<ItemGroup>
-		<!--<PackageReference Include="Dragonfly.Net6" Version="1.3.0" />-->
-		<PackageReference Include="Dragonfly.Net6" Version="1.0.0" />
-		<PackageReference Include="Umbraco.Cms.Core" Version="[10.0.1,13.999.999]" />
-		<PackageReference Include="Umbraco.Cms.Web.Website" Version="10.0.1" PrivateAssets="All" />
-		<PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="10.0.1" PrivateAssets="All" />
+		<PackageReference Include="Dragonfly.Net6" Version="2.0.0" />
 	</ItemGroup>
 
 	<!--Include App_Plugins & targets file-->
@@ -84,13 +104,13 @@
 	<Import Project="..\Custom.targets" />
 
 	<ItemGroup>
-	  <None Remove="App_Plugins\Dragonfly.SchemaImporter\schemaImporter.css" />
+		<None Remove="App_Plugins\Dragonfly.SchemaImporter\schemaImporter.css" />
 	</ItemGroup>
 
 
 	<!-- Excluded Files -->
 	<ItemGroup>
-	  <Folder Include="SchemaImporter\Models\" />
+		<Folder Include="SchemaImporter\Models\" />
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">

@@ -163,7 +163,7 @@
 		// Copied from Umbraco Core (\src\Umbraco.Infrastructure\Services\Implement\PackagingService.cs)
 		// and EDITED slightly
 		public InstallationSummary InstallCompiledPackageData(
-		 XDocument? packageXml,
+		 XDocument packageXml,
 		 int userId = Constants.Security.SuperUserId)
 		{
 			CompiledPackage compiledPackage = _PackagingService.GetCompiledPackageInfo(packageXml);

@@ -2,249 +2,244 @@
 
 namespace Dragonfly.SchemaImporter;
 
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Text;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Dragonfly.NetModels;
-    using Dragonfly.SchemaImporter.Services;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Logging;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Serialization;
-    using Umbraco.Cms.Web.BackOffice.Controllers;
-    using Umbraco.Cms.Web.Common.Attributes;
-    using Umbraco.Extensions;
-    using System.Collections.Generic;
-
-    //  /umbraco/backoffice/Dragonfly/SchemaImporter/
-    [PluginController("Dragonfly")]
-    [IsBackOffice]
-    public class SchemaImporterController : UmbracoAuthorizedApiController
-    {
-
-        private readonly ILogger<SchemaImporterController> _logger;
-        private readonly SchemaImporterService _SchemaImporterService;
-
-        public SchemaImporterController(
-            ILogger<SchemaImporterController> logger,
-            SchemaImporterService schemaImporterService
-        )
-        {
-            _logger = logger;
-            _SchemaImporterService = schemaImporterService;
-        }
-
-        //  /umbraco/backoffice/Dragonfly/SchemaImporter/GetApi
-        /// <summary>
-        ///  simple call, used to locate the controller
-        ///  when we inject it into the javascript variables.
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public string GetApi() => "Hello, Schema Import Controller Found.";
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Dragonfly.NetModels;
+using Dragonfly.SchemaImporter.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Extensions;
 
 
-        //  /umbraco/backoffice/Dragonfly/SchemaImporter/GetVersion
-        [HttpGet]
-        public string GetVersion()
-        {
-            return PackageInfo.Version.ToString();
-        }
+//  /umbraco/backoffice/Dragonfly/SchemaImporter/
+[PluginController("Dragonfly")]
+[IsBackOffice]
+public class SchemaImporterController : UmbracoAuthorizedApiController
+{
+
+	private readonly ILogger<SchemaImporterController> _logger;
+	private readonly SchemaImporterService _SchemaImporterService;
+
+	public SchemaImporterController(
+		ILogger<SchemaImporterController> logger,
+		SchemaImporterService schemaImporterService
+	)
+	{
+		_logger = logger;
+		_SchemaImporterService = schemaImporterService;
+	}
+
+	//  /umbraco/backoffice/Dragonfly/SchemaImporter/GetApi
+	/// <summary>
+	///  simple call, used to locate the controller
+	///  when we inject it into the javascript variables.
+	/// </summary>
+	/// <returns></returns>
+	[HttpGet]
+	public string GetApi() => "Hello, Schema Import Controller Found.";
 
 
-        //  /umbraco/backoffice/Dragonfly/SchemaImporter/ImportDefault
-        [HttpGet]
-        public ActionResult ImportDefault()
-        {
-            var fileName = "package.xml";
-            var filePath = "/Temp/" + _SchemaImporterService.TempFolderName.EnsureEndsWith("/") + fileName;
-            var result = _SchemaImporterService.ImportPackageXmlOnly(filePath);
-
-            result.Message = $"Importing '{fileName}'...";
-
-            // var json = JsonConvert.SerializeObject(result);
-
-            return new JsonResult(result);
-        }
-
-        //  /umbraco/backoffice/Dragonfly/SchemaImporter/UploadImport
-        //Based on code From https://github.com/KevinJump/uSync/blob/f0f045a9fa77f5d6b5e4052598c516f4c74db858/uSync.BackOffice/Controllers/uSyncDashboardApiController.cs#L316
-        [HttpPost]
-        public async Task<UploadImportResult> UploadImport()
-        {
-            var msgDefault = $"Error occurred during Schema Import.";
-
-            var file = Request.Form.Files[0];
-            //var clean = Request.Form["clean"];
-
-            if (file.Length > 0)
-            {
-                var stub = Path.GetFileNameWithoutExtension(file.FileName);
-                var ext = Path.GetExtension(file.FileName);
-                var tempFileName = Dragonfly.NetHelpers.Strings.CreateUniqueName(stub) + ext;
-
-                var tempFolder = _SchemaImporterService.TempFolderFullPath;
-                var tempFile = Path.Combine(tempFolder, tempFileName);
-
-                Directory.CreateDirectory(Path.GetDirectoryName(tempFile));
-
-                using (var stream = new FileStream(tempFile, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-
-                try
-                {
-                    if (ext == ".xml")
-                    {
-                        var result = _SchemaImporterService.ImportPackageXmlOnly(tempFile);
-                        if (!result.Success)
-                        {
-                            return new UploadImportResult(false)
-                            {
-                                Errors = ConvertStatusMessageToErrorsList(result),
-                                FilePath = tempFile,
-                                DetailedResultStatus = result
-                            };
-                        }
-                        else
-                        {
-                            return new UploadImportResult(true)
-                            {
-                                FilePath = tempFile,
-                                DetailedResultStatus = result
-                            };
-                        }
-                    }
-                    else if (ext == ".zip")
-                    {
-                        var error = "Zip files are not yet supported.";
-                        var result = new StatusMessage(false, error);
-                        return new UploadImportResult(false)
-                        {
-                            Errors = error.AsEnumerableOfOne(),
-                            FilePath = tempFile,
-                            DetailedResultStatus = result
-                        };
-                    }
-                    else
-                    {
-                        var error = $"Files of type '{ext}' are not supported.";
-
-                        _logger.LogError($"{msgDefault}: {error}");
-
-                        var result = new StatusMessage(false, error);
-                        return new UploadImportResult(false)
-                        {
-                            Errors = error.AsEnumerableOfOne(),
-                            FilePath = tempFile,
-                            DetailedResultStatus = result
-                        };
-                    }
-                }
-                catch (Exception ex)
-                {
-                    var result = new StatusMessage(false, msgDefault);
-                    result.SetRelatedException( ex);
-
-                    _logger.LogError($"{msgDefault}: {ex.Message}", ex);
+	//  /umbraco/backoffice/Dragonfly/SchemaImporter/GetVersion
+	[HttpGet]
+	public string GetVersion()
+	{
+		return PackageInfo.Version.ToString();
+	}
 
 
-                    var errs = msgDefault.AsEnumerableOfOne().ToList();
-                    errs.Add(ex.Message);
+	//  /umbraco/backoffice/Dragonfly/SchemaImporter/ImportDefault
+	[HttpGet]
+	public ActionResult ImportDefault()
+	{
+		var fileName = "package.xml";
+		var filePath = "/Temp/" + _SchemaImporterService.TempFolderName.EnsureEndsWith("/") + fileName;
+		var result = _SchemaImporterService.ImportPackageXmlOnly(filePath);
 
-                    return new UploadImportResult(false)
-                    {
-                        Errors = errs,
-                        FilePath = tempFile,
-                        DetailedResultStatus = result
-                    };
-                }
-                finally
-                {
-                    // remove the temp folder & file
-                    _SchemaImporterService.DeleteFile(tempFile);
-                    _SchemaImporterService.DeleteFolder(tempFolder, true);
-                }
-            }
-            else
-            {
-                var errorFile = $"File is empty.";
-                var result = new StatusMessage(false, errorFile);
-                return new UploadImportResult(false)
-                {
-                    Errors = errorFile.AsEnumerableOfOne(),
-                    DetailedResultStatus = result
-                };
-            }
+		result.Message = $"Importing '{fileName}'...";
 
-        }
+		// var json = JsonConvert.SerializeObject(result);
 
-        private IEnumerable<string> ConvertStatusMessageToErrorsList(StatusMessage Msg)
-        {
-            var errors = new List<string>();
+		return new JsonResult(result);
+	}
 
-            if (Msg.HasAnyExceptions())
-            {
-                if (Msg.GetRelatedException() != null)
-                {
-                    var err = $"Exception: {Msg.GetRelatedException().Message} - See Log for details";
-                    errors.Add(err);
-                }
+	//  /umbraco/backoffice/Dragonfly/SchemaImporter/UploadImport
+	//Based on code From https://github.com/KevinJump/uSync/blob/f0f045a9fa77f5d6b5e4052598c516f4c74db858/uSync.BackOffice/Controllers/uSyncDashboardApiController.cs#L316
+	[HttpPost]
+	public async Task<UploadImportResult> UploadImport()
+	{
+		var msgDefault = $"Error occurred during Schema Import.";
 
-                if (Msg.InnerStatuses.Any())
-                {
-                    foreach (var innerStatus in Msg.InnerStatuses)
-                    {
-                        if (innerStatus.GetRelatedException() != null)
-                        {
-                            var err = $"Exception: {innerStatus.GetRelatedException().Message} - See Log for details";
-                            errors.Add(err);
-                        }
-                    }
-                }
-            }
+		var file = Request.Form.Files[0];
+		//var clean = Request.Form["clean"];
 
-            if (Msg.DetailedMessages.Any())
-            {
-                errors.AddRange(Msg.DetailedMessages);
-            }
+		if (file.Length == 0)
+		{
+			var errorFile = $"File is empty.";
+			var result = new StatusMessage(false, errorFile);
+			return new UploadImportResult(false)
+			{
+				Errors = errorFile.AsEnumerableOfOne(),
+				DetailedResultStatus = result
+			};
+		}
 
-            if (Msg.InnerStatuses.Any())
-            {
-                foreach (var innerStatus in Msg.InnerStatuses)
-                {
-                    if (innerStatus.DetailedMessages.Any())
-                    {
-                        errors.AddRange(Msg.DetailedMessages);
-                    }
-                }
-            }
+		var stub = Path.GetFileNameWithoutExtension(file.FileName);
+		var ext = Path.GetExtension(file.FileName);
+		var tempFileName = Dragonfly.NetHelpers.Strings.CreateUniqueName(stub) + ext;
 
-            return errors;
-        }
+		var tempFolder = _SchemaImporterService.TempFolderFullPath;
+		var tempFile = Path.Combine(tempFolder, tempFileName);
 
-    }
+		Directory.CreateDirectory(Path.GetDirectoryName(tempFile));
+
+		using (var stream = new FileStream(tempFile, FileMode.Create))
+		{
+			await file.CopyToAsync(stream);
+		}
+
+		try
+		{
+			if (ext == ".xml")
+			{
+				var result = _SchemaImporterService.ImportPackageXmlOnly(tempFile);
+				if (!result.Success)
+				{
+					return new UploadImportResult(false)
+					{
+						Errors = ConvertStatusMessageToErrorsList(result),
+						FilePath = tempFile,
+						DetailedResultStatus = result
+					};
+				}
+				else
+				{
+					return new UploadImportResult(true)
+					{
+						FilePath = tempFile,
+						DetailedResultStatus = result
+					};
+				}
+			}
+			else if (ext == ".zip")
+			{
+				var error = "Zip files are not yet supported.";
+				var result = new StatusMessage(false, error);
+				return new UploadImportResult(false)
+				{
+					Errors = error.AsEnumerableOfOne(),
+					FilePath = tempFile,
+					DetailedResultStatus = result
+				};
+			}
+			else
+			{
+				var error = $"Files of type '{ext}' are not supported.";
+
+				_logger.LogError($"{msgDefault}: {error}");
+
+				var result = new StatusMessage(false, error);
+				return new UploadImportResult(false)
+				{
+					Errors = error.AsEnumerableOfOne(),
+					FilePath = tempFile,
+					DetailedResultStatus = result
+				};
+			}
+		}
+		catch (Exception ex)
+		{
+			var result = new StatusMessage(false, msgDefault);
+			result.SetRelatedException(ex);
+
+			_logger.LogError($"{msgDefault}: {ex.Message}", ex);
 
 
-    [JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
-    public class UploadImportResult
-    {
-        public UploadImportResult(bool success)
-        {
-            Success = success;
-        }
+			var errs = msgDefault.AsEnumerableOfOne().ToList();
+			errs.Add(ex.Message);
 
-        public bool Success { get; set; }
+			return new UploadImportResult(false)
+			{
+				Errors = errs,
+				FilePath = tempFile,
+				DetailedResultStatus = result
+			};
+		}
+		finally
+		{
+			// remove the temp folder & file
+			_SchemaImporterService.DeleteFile(tempFile);
+			_SchemaImporterService.DeleteFolder(tempFolder, true);
+		}
+	}
 
-        public IEnumerable<string> Errors { get; set; }
-        public string FilePath { get; set; }
+	private IEnumerable<string> ConvertStatusMessageToErrorsList(StatusMessage Msg)
+	{
+		var errors = new List<string>();
 
-        public StatusMessage DetailedResultStatus { get; set; }
-    }
+		if (Msg.HasAnyExceptions())
+		{
+			if (Msg.GetRelatedException() != null)
+			{
+				var err = $"Exception: {Msg.GetRelatedException().Message} - See Log for details";
+				errors.Add(err);
+			}
+
+			if (Msg.InnerStatuses.Any())
+			{
+				foreach (var innerStatus in Msg.InnerStatuses)
+				{
+					if (innerStatus.GetRelatedException() != null)
+					{
+						var err = $"Exception: {innerStatus.GetRelatedException().Message} - See Log for details";
+						errors.Add(err);
+					}
+				}
+			}
+		}
+
+		if (Msg.DetailedMessages.Any())
+		{
+			errors.AddRange(Msg.DetailedMessages);
+		}
+
+		if (Msg.InnerStatuses.Any())
+		{
+			foreach (var innerStatus in Msg.InnerStatuses)
+			{
+				if (innerStatus.DetailedMessages.Any())
+				{
+					errors.AddRange(Msg.DetailedMessages);
+				}
+			}
+		}
+
+		return errors;
+	}
+
+}
+
+
+[JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
+public class UploadImportResult
+{
+	public UploadImportResult(bool success)
+	{
+		Success = success;
+	}
+
+	public bool Success { get; set; }
+
+	public IEnumerable<string> Errors { get; set; }
+	public string FilePath { get; set; }
+
+	public StatusMessage DetailedResultStatus { get; set; }
+}
 
 
